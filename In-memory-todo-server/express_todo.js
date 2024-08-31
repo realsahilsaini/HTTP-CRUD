@@ -39,6 +39,20 @@ app.delete('/:id', (req, res) => {
   res.json(todos);
 });
 
+app.put('/:id', (req, res) => {
+  const todoId = parseInt(req.params.id);
+  const index = todos.findIndex( todo => todo.id === todoId);
+  console.log(index);
+
+  
+  if(index < 0 && index >= todos.length) { 
+    res.status(404).json({ message: 'ToDo not found' })
+    return;
+  }
+  todos[index].title = req.body.title;
+  res.json(todos);
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
