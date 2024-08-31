@@ -8,13 +8,13 @@ app.use(express.json());
 let todos = [];
 
 //Get all todos
-app.get('/todos', (req, res) => {
+app.get('/', (req, res) => {
   res.json(todos);
 });
 
 
 //Create a new todo
-app.post('/todos', (req, res) => {
+app.post('/', (req, res) => {
   const newTodo = {
     id: todos.length + 1, //auto incrementing id
     title: req.body.title, 
@@ -24,16 +24,19 @@ app.post('/todos', (req, res) => {
 });
 
 //Delete a todo
-app.delete('/todos/:id', (req, res) => {
+app.delete('/:id', (req, res) => {
   const todoId = parseInt(req.params.id);
   const index = todos.findIndex( todo => todo.id === todoId);
+  console.log(index);
 
   
-  if(todoId < 1 || todoId >= todos.length) {
+  if(index < 0 && index >= todos.length) { 
     res.status(404).json({ message: 'ToDo not found' })
     return;
   }
   todos.splice(index, 1);
+
+  res.json(todos);
 });
 
 // Start the server
