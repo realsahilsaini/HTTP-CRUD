@@ -42,7 +42,7 @@ app.delete('/:id', (req, res) => {
 app.put('/:id', (req, res) => {
   const todoId = parseInt(req.params.id);
   const index = todos.findIndex( todo => todo.id === todoId);
-  console.log(index);
+  // console.log(index);
 
   
   if(index < 0 && index >= todos.length) { 

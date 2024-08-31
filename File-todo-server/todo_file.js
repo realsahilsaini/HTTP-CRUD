@@ -24,14 +24,14 @@ app.use(express.json());
 
 
 //GET todos
-app.get('/todos', (req, res) => {
+app.get('/', (req, res) => {
   const todos = loadTodos();
   res.json(todos);
 });
 
 
 //Add todo POST
-app.post('/todos', (req, res) => {
+app.post('/', (req, res) => {
   const todos = loadTodos();
   const newTodo = {
     id: todos.length + 1, //auto incrementing id
@@ -44,17 +44,32 @@ app.post('/todos', (req, res) => {
 
 
 //Delete todo
-app.delete('/todos/:id', (req, res) => {
+app.delete('/:id', (req, res) => {
   const todos = loadTodos();
 
   const todoId = parseInt(req.params.id);
-  if(todoId < 1 || todoId>=todos.length) {
+  if(todoId < 1 && todoId>=todos.length) {
     res.status(404).json({ message: 'ToDo not found' });
     return;
   }
   const index = todos.findIndex( todo => todo.id === todoId);
 
   todos.splice(index, 1);
+  saveTodos(todos);
+  res.json(todos);
+});
+
+//Update todo
+app.put('/:id', (req, res) => {
+  const todos = loadTodos();
+  const todoId = parseInt(req.params.id);
+  const index = todos.findIndex( todo => todo.id === todoId);
+  if(index < 0 || index>=todos.length) {
+    res.status(404).json({ message: 'ToDo not found' });
+    return;
+  }
+
+  todos[index].title = req.body.title;
   saveTodos(todos);
   res.json(todos);
 });
