@@ -30,21 +30,24 @@ function saveTodos(todos){
 
 
 //Get todos for all users
-app.get('/todos', (req, res) => {
+app.get('/', (req, res) => {
   const todos = loadTodos();
   res.json(todos);
 });
 
 //Get todos for a specific user
-app.get('/todos/:user', (req, res) => {
+app.get('/:user', (req, res) => {
   const todos = loadTodos();
   const userTodos = todos[req.params.user];
+  if(!userTodos){
+    return res.status(404).send('User not found');
+  }
   res.json(userTodos);
 });
 
 
 //Post a new todo for a specific user
-app.post('/todos/:user', (req, res) => {
+app.post('/:user', (req, res) => {
   const todos = loadTodos();
   const userTodos = todos[req.params.user];
   if(!userTodos){
@@ -61,7 +64,7 @@ app.post('/todos/:user', (req, res) => {
 
 
 //POST a new user
-app.post('/todos/newuser/:username', (req, res) => {
+app.post('/newuser/:username', (req, res) => {
   const todos = loadTodos();
   const newUser = req.params.username;
   todos[newUser] = [];
@@ -71,14 +74,14 @@ app.post('/todos/newuser/:username', (req, res) => {
 
 
 //Delete a todo for a specific user
-app.delete('/todos/:user/:id', (req, res) => {
+app.delete('/:user/:id', (req, res) => {
   const todos = loadTodos();
   const userTodos = todos[req.params.user];
   if(!userTodos){
     return [];
   }
   const todoIndex = userTodos.findIndex(todo => todo.id === parseInt(req.params.id));
-  if(todoIndex === -1 || !userTodos[todoIndex]){
+  if(todoIndex === -1 && !userTodos[todoIndex]){
     return res.status(404).send('Todo not found');
   }
   userTodos.splice(todoIndex, 1);
@@ -88,13 +91,30 @@ app.delete('/todos/:user/:id', (req, res) => {
 
 
 //Delete a user
-app.delete('/todos/:user', (req, res) => {
+app.delete('/:user', (req, res) => {
   const todos = loadTodos();
   const userTodos = todos[req.params.user];
   if(!userTodos){
     return res.status(404).send('Todo not found');
   }
   delete todos[req.params.user];
+  saveTodos(todos);
+  res.json(todos);
+})
+
+//Update a todo for a specific user
+app.put('/:user/:id', (req, res)=>{
+  const todos = loadTodos();
+  const todoId = parseInt(req.params.id);
+  const userTodos = todos[req.params.user];
+  if(!userTodos){
+    return res.status(404).send('User not found');
+  }
+  const todoIndex = userTodos.findIndex(todo => todo.id === todoId);
+  if(todoIndex < 0 && todoIndex >= todos.length){
+    return res.status(404).send('Todo not found');
+  }
+  userTodos[todoIndex].title = req.body.title;
   saveTodos(todos);
   res.json(todos);
 })
